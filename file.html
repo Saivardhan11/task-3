@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space.Play</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Space-themed styles */
+        body {
+            background: black;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Navbar (Main Content Navigation) */
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 10;
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .navbar a {
+            color: cyan;
+            text-decoration: none;
+            font-size: 1.2em;
+            transition: 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #ffcc00;
+        }
+
+        /* Video Container */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 50vh;
+            margin-top: 120px;
+            position: relative;
+        }
+
+        iframe {
+            border: 2px solid cyan;
+            border-radius: 10px;
+            box-shadow: 0 0 20px cyan;
+            width: 80%;
+            height: 400px;
+            transition: all 0.3s ease;
+        }
+
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .controls button, .controls select, .controls input[type=range] {
+            background: black;
+            color: cyan;
+            border: 1px solid cyan;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .controls button:hover, .controls select:hover {
+            background: cyan;
+            color: black;
+        }
+
+        section {
+            padding: 50px;
+            text-align: center;
+        }
+
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        /* Bottom Navbar */
+        .bottom-navbar {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .bottom-navbar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .bottom-navbar a {
+            color: cyan;
+            text-decoration: none;
+            font-size: 1.2em;
+            transition: 0.3s;
+        }
+
+        .bottom-navbar a:hover {
+            color: #ffcc00;
+        }
+
+        /* Stretch the content to accommodate the new sections */
+        .content {
+            min-height: 100vh;
+            padding-bottom: 60px; /* Space for bottom navbar */
+        }
+
+        /* YouTube Video Embeds */
+        .video-embed {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navbar (Main Content Navigation) -->
+    <nav class="navbar">
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#video-player">Back to Video</a></li>
+        </ul>
+    </nav>
+
+    <!-- Video Container -->
+    <div id="video-player" class="video-container">
+        <iframe id="video" src="https://www.youtube.com/embed/3Wqphkd4A8A?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <div class="controls">
+            <!-- Custom Controls -->
+            <button id="prev-song">⏮️</button>
+            <button id="play-pause">Pause</button>
+            <button id="next-song">⏭️</button>
+
+            <!-- Progress Bar -->
+            <input type="range" id="progress" value="0">
+
+            <!-- Volume Control -->
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+
+            <!-- Speed Control -->
+            <select id="speed">
+                <option value="0.5">0.5x</option>
+                <option value="1" selected>1x</option>
+                <option value="1.5">1.5x</option>
+                <option value="2">2x</option>
+            </select>
+
+            <!-- Maximize/Minimize Button -->
+            <button id="maximize">⛶</button>
+        </div>
+    </div>
+
+    <!-- Content Sections -->
+    <div class="content">
+        <!-- Home Section -->
+        <section id="home">
+            <h2>Welcome to Space.Play</h2>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <h2>About Space.Play</h2>
+            <p>Space.Play is your one-stop destination for exploring space-related content and experiences. From educational videos to interactive missions, we aim to bring the cosmos closer to you.</p>
+        </section>
+    </div>
+
+    <!-- Star Background -->
+    <canvas id="starCanvas"></canvas>
+
+    <!-- Bottom Navbar -->
+    <div class="bottom-navbar">
+        <ul>
+            <li><a href="#about">About</a></li>
+        </ul>
+    </div>
+
+    <script>
+        // Smooth Scroll for Content Sections
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Video Controls Logic (Play, Pause, Volume, etc.)
+        const iframe = document.getElementById('video');
+        const playButton = document.getElementById('play-pause');
+        const prevButton = document.getElementById('prev-song');
+        const nextButton = document.getElementById('next-song');
+        const volumeSlider = document.getElementById('volume');
+        const progressBar = document.getElementById('progress');
+        const speedSelector = document.getElementById('speed');
+        const maximizeButton = document.getElementById('maximize');
+
+        // Playlist (YouTube video IDs)
+        const playlist = [
+            "3Wqphkd4A8A", // Current video
+            "1Sw7modBwsM",  // Next video
+            "XhW3i2f54BQ" // Previous video
+        ];
+
+        let currentVideoIndex = 0;
+
+        // Play/Pause Toggle
+        playButton.addEventListener('click', () => {
+            const src = iframe.src;
+            if (src.includes("autoplay=1")) {
+                iframe.src = src.replace("autoplay=1", "autoplay=0");
+                playButton.innerText = "Play";
+            } else {
+                iframe.src = src.replace("autoplay=0", "autoplay=1");
+                playButton.innerText = "Pause";
+            }
+        });
+
+        // Previous Song
+        prevButton.addEventListener('click', () => {
+            currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length;
+            iframe.src = `https://www.youtube.com/embed/${playlist[currentVideoIndex]}?autoplay=1`;
+            playButton.innerText = "Pause";
+        });
+
+        // Next Song
+        nextButton.addEventListener('click', () => {
+            currentVideoIndex = (currentVideoIndex + 1) % playlist.length;
+            iframe.src = `https://www.youtube.com/embed/${playlist[currentVideoIndex]}?autoplay=1`;
+            playButton.innerText = "Pause";
+        });
+
+        // Volume Control
+        volumeSlider.addEventListener('input', () => {
+            // We cannot control volume of iframe directly through embed, so you may need YouTube API for that.
+        });
+
+        // Video Speed Control
+        speedSelector.addEventListener('change', () => {
+            // You would need YouTube API to change playback speed in an iframe
+        });
+
+        // Maximize/Minimize Button functionality
+        maximizeButton.addEventListener('click', () => {
+            const videoContainer = document.querySelector('.video-container');
+            if (videoContainer.style.position !== "fixed") {
+                // Maximize
+                videoContainer.style.position = "fixed";
+                videoContainer.style.top = "50%";
+                videoContainer.style.left = "50%";
+                videoContainer.style.transform = "translate(-50%, -50%)";
+                videoContainer.style.width = "90%";
+                videoContainer.style.height = "90%";
+                iframe.style.width = "100%";
+                iframe.style.height = "100%";
+                maximizeButton.innerText = "⛶"; // Minimize
+            } else {
+                // Minimize
+                videoContainer.style.position = "relative";
+                videoContainer.style.width = "80%";
+                videoContainer.style.height = "auto";
+                iframe.style.width = "80%";
+                iframe.style.height = "400px";
+                maximizeButton.innerText = "⛶"; // Maximize
+            }
+        });
+    </script>
+</body>
+</html>
